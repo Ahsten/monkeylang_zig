@@ -24,13 +24,30 @@ pub const Token = struct {
         r_paren,
         l_brace,
         r_brace,
-        function,
-        let,
+        keyword_function,
+        keyword_let,
+        minus,
+        bang,
+        asterisk,
+        slash,
+        less_than,
+        greater_than,
+        keyword_true,
+        keyword_false,
+        keyword_if,
+        keyword_else,
+        keyword_return,
+        
     };
 
     pub const keywords = std.StaticStringMap(TokenType).initComptime(.{
-        .{"fn", .function},
-        .{"let", .let},
+        .{"fn", .keyword_function},
+        .{"let", .keyword_let},
+        .{"true", .keyword_true},
+        .{"false", .keyword_false},
+        .{"if", .keyword_if},
+        .{"else", .keyword_else},
+        .{"return", .keyword_return},
     });
 
     pub fn getKeyword(string: []const u8) ?TokenType {
@@ -51,5 +68,5 @@ const expectEqual = std.testing.expectEqual;
 
 test "get keyword" {
     const keyword = Token.keywords.get("let");
-    try expectEqual(Token.TokenType.let, keyword);
+    try expectEqual(Token.TokenType.keyword_let, keyword);
 }

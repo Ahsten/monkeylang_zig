@@ -79,6 +79,12 @@ pub const Lexer = struct {
             '}' => token.kind = TokenType.r_brace,
             '(' => token.kind = TokenType.l_paren,
             ')' => token.kind = TokenType.r_paren,
+            '-' => token.kind = TokenType.minus,
+            '!' => token.kind = TokenType.bang,
+            '*' => token.kind = TokenType.asterisk,
+            '/' => token.kind = TokenType.slash,
+            '>' => token.kind = TokenType.greater_than,
+            '<' => token.kind = TokenType.less_than,
             0 => token.kind = TokenType.eof,
             'a'...'z', 'A'...'Z', '_' => {
                 const identifer = self.readIdentifier();
@@ -124,26 +130,37 @@ test "keywords and identifiers" {
     const input = 
     \\let five = 5;
     \\let ten = 10;
+    \\
     \\let add = fn(x, y){
     \\x+y;
     \\};
+    \\
     \\let result = add(five, ten);
+    \\
+    \\!-/*5;
+    \\5 < 10 > 5
+    \\
+    \\if(5 < 10){
+    \\  return true;
+    \\} else {
+    \\  return false;
+    \\}
 ;
     const expected_tokens = [_]Token{
-        Token.init("let", TokenType.let),
+        Token.init("let", TokenType.keyword_let),
         Token.init("five", TokenType.ident),
         Token.init("=", TokenType.assign),
         Token.init("5", TokenType.int),
         Token.init(";", TokenType.semicolon),
-        Token.init("let", TokenType.let),
+        Token.init("let", TokenType.keyword_let),
         Token.init("ten", TokenType.ident),
         Token.init("=", TokenType.assign),
         Token.init("10", TokenType.int),
         Token.init(";", TokenType.semicolon),
-        Token.init("let", TokenType.let),
+        Token.init("let", TokenType.keyword_let),
         Token.init("add", TokenType.ident),
         Token.init("=", TokenType.assign),
-        Token.init("fn", TokenType.function),
+        Token.init("fn", TokenType.keyword_function),
         Token.init("(", TokenType.l_paren),
         Token.init("x", TokenType.ident),
         Token.init(",", TokenType.comma),
@@ -156,7 +173,7 @@ test "keywords and identifiers" {
         Token.init(";", TokenType.semicolon),
         Token.init("}", TokenType.r_brace),
         Token.init(";", TokenType.semicolon),
-        Token.init("let", TokenType.let),
+        Token.init("let", TokenType.keyword_let),
         Token.init("result", TokenType.ident),
         Token.init("=", TokenType.assign),
         Token.init("add", TokenType.ident),
@@ -166,7 +183,35 @@ test "keywords and identifiers" {
         Token.init("ten", TokenType.ident),
         Token.init(")", TokenType.r_paren),
         Token.init(";", TokenType.semicolon),
-        Token.init("0", TokenType.eof)
+        Token.init("!", TokenType.bang),
+        Token.init("-", TokenType.minus),
+        Token.init("/", TokenType.slash),
+        Token.init("*", TokenType.asterisk),
+        Token.init("5", TokenType.int),
+        Token.init(";", TokenType.semicolon),
+        Token.init("5", TokenType.int),
+        Token.init("<", TokenType.less_than),
+        Token.init("10", TokenType.int),
+        Token.init(">", TokenType.greater_than),
+        Token.init("5", TokenType.int),
+        Token.init("if", TokenType.keyword_if),
+        Token.init("(", TokenType.l_paren),
+        Token.init("5", TokenType.int),
+        Token.init("<", TokenType.less_than),
+        Token.init("10", TokenType.int),
+        Token.init(")", TokenType.r_paren),
+        Token.init("{", TokenType.l_brace),
+        Token.init("return", TokenType.keyword_return),
+        Token.init("true", TokenType.keyword_true),
+        Token.init(";", TokenType.semicolon),
+        Token.init("}", TokenType.r_brace),
+        Token.init("else", TokenType.keyword_else),
+        Token.init("{", TokenType.l_brace),
+        Token.init("return", TokenType.keyword_return),
+        Token.init("false", TokenType.keyword_false),
+        Token.init(";", TokenType.semicolon),
+        Token.init("}", TokenType.r_brace),
+        Token.init("0", TokenType.eof),
     };
 
     var lexer = Lexer.init(input);
