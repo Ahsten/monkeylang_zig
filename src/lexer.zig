@@ -65,13 +65,29 @@ pub const Lexer = struct {
         }
     }
 
+    fn peek(self: *Lexer) u8 {
+        if(self.readPosition < self.input.len) {
+            return self.input[self.readPosition];
+        } else {
+            return 0;
+        }
+    }
+
     pub fn nextToken(self: *Lexer) Token {
         self.skipWhitespace();
         const chars = self.getCurrentString(); 
         var token: Token = Token.init(chars, TokenType.illegal);
 
         switch (self.ch) {
-            '=' => token.kind = TokenType.assign,
+            '=' => {
+                if(self.peek() == '='){
+                    self.readChar();
+                    token.literal = "==";
+                    token.kind = TokenType.equal_equal;
+                } else {
+                    token.kind = TokenType.assign;
+                }
+            },
             '+' => token.kind = TokenType.plus,
             ';' => token.kind = TokenType.semicolon,
             ',' => token.kind = TokenType.comma,
@@ -80,7 +96,15 @@ pub const Lexer = struct {
             '(' => token.kind = TokenType.l_paren,
             ')' => token.kind = TokenType.r_paren,
             '-' => token.kind = TokenType.minus,
-            '!' => token.kind = TokenType.bang,
+            '!' => {
+                if(self.peek() == '='){
+                    self.readChar();
+                    token.literal = "!=";
+                    token.kind = TokenType.not_equal;
+                } else {
+                    token.kind = TokenType.bang;
+                }
+            },
             '*' => token.kind = TokenType.asterisk,
             '/' => token.kind = TokenType.slash,
             '>' => token.kind = TokenType.greater_than,
@@ -145,6 +169,9 @@ test "keywords and identifiers" {
     \\} else {
     \\  return false;
     \\}
+    \\
+    \\10 == 10
+    \\10 != 9
 ;
     const expected_tokens = [_]Token{
         Token.init("let", TokenType.keyword_let),
@@ -211,6 +238,12 @@ test "keywords and identifiers" {
         Token.init("false", TokenType.keyword_false),
         Token.init(";", TokenType.semicolon),
         Token.init("}", TokenType.r_brace),
+        Token.init("10", TokenType.int),
+        Token.init("==", TokenType.equal_equal),
+        Token.init("10", TokenType.int),
+        Token.init("10", TokenType.int),
+        Token.init("!=", TokenType.not_equal),
+        Token.init("9", TokenType.int),
         Token.init("0", TokenType.eof),
     };
 
