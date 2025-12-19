@@ -66,7 +66,7 @@ pub const Lexer = struct {
     }
 
     fn peek(self: *Lexer) u8 {
-        if(self.readPosition < self.input.len) {
+        if (self.readPosition < self.input.len) {
             return self.input[self.readPosition];
         } else {
             return 0;
@@ -75,12 +75,12 @@ pub const Lexer = struct {
 
     pub fn nextToken(self: *Lexer) Token {
         self.skipWhitespace();
-        const chars = self.getCurrentString(); 
+        const chars = self.getCurrentString();
         var token: Token = Token.init(chars, TokenType.illegal);
 
         switch (self.ch) {
             '=' => {
-                if(self.peek() == '='){
+                if (self.peek() == '=') {
                     self.readChar();
                     token.literal = "==";
                     token.kind = TokenType.equal_equal;
@@ -97,7 +97,7 @@ pub const Lexer = struct {
             ')' => token.kind = TokenType.r_paren,
             '-' => token.kind = TokenType.minus,
             '!' => {
-                if(self.peek() == '='){
+                if (self.peek() == '=') {
                     self.readChar();
                     token.literal = "!=";
                     token.kind = TokenType.not_equal;
@@ -151,28 +151,28 @@ test "nextToken" {
 }
 
 test "keywords and identifiers" {
-    const input = 
-    \\let five = 5;
-    \\let ten = 10;
-    \\
-    \\let add = fn(x, y){
-    \\x+y;
-    \\};
-    \\
-    \\let result = add(five, ten);
-    \\
-    \\!-/*5;
-    \\5 < 10 > 5
-    \\
-    \\if(5 < 10){
-    \\  return true;
-    \\} else {
-    \\  return false;
-    \\}
-    \\
-    \\10 == 10
-    \\10 != 9
-;
+    const input =
+        \\let five = 5;
+        \\let ten = 10;
+        \\
+        \\let add = fn(x, y){
+        \\x+y;
+        \\};
+        \\
+        \\let result = add(five, ten);
+        \\
+        \\!-/*5;
+        \\5 < 10 > 5
+        \\
+        \\if(5 < 10){
+        \\  return true;
+        \\} else {
+        \\  return false;
+        \\}
+        \\
+        \\10 == 10
+        \\10 != 9
+    ;
     const expected_tokens = [_]Token{
         Token.init("let", TokenType.keyword_let),
         Token.init("five", TokenType.ident),
