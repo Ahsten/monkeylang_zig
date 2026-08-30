@@ -2,14 +2,16 @@ const std = @import("std");
 const monkeylang = @import("monkeylang");
 const repl = @import("repl.zig");
 
-var stdin_buffer: [1024]u8 = undefined;
-var stdout_buffer: [1024]u8 = undefined;
-var stdout_writer = std.fs.File.stdout().writer(&stdout_buffer);
-var stdin_reader = std.fs.File.stdin().reader(&stdin_buffer);
-const stdin = &stdin_reader.interface;
-const stdout = &stdout_writer.interface;
+pub fn main(init: std.process.Init) !void {
+    const io = init.io;
 
-pub fn main() !void {
+    var stdin_buffer: [1024]u8 = undefined;
+    var stdout_buffer: [1024]u8 = undefined;
+    var stdout_writer = std.Io.File.stdout().writer(io, &stdout_buffer);
+    var stdin_reader = std.Io.File.stdin().reader(io, &stdin_buffer);
+    const stdin = &stdin_reader.interface;
+    const stdout = &stdout_writer.interface;
+
     try stdout.writeAll("Hello! This is the Monkey programming language\n");
     try stdout.flush();
     try stdout.writeAll("Feel free to type in commands\n");
