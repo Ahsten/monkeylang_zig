@@ -1,3 +1,13 @@
+const Precedence = enum {
+    lowest,
+    equals,
+    less_greater,
+    sum,
+    product,
+    prefix,
+    call,
+    index,
+};
 const Parser = struct {
     lexer: *Lexer,
     cur_token: Token,
@@ -40,7 +50,7 @@ const Parser = struct {
         return switch (self.cur_token.kind) {
             .keyword_let => self.parseLetStatement(),
             .keyword_return => self.parseReturnStatement(),
-            else => unreachable,
+            else => self.parseExpressionStatement(),
         };
     }
 
@@ -89,6 +99,18 @@ const Parser = struct {
         };
     }
 
+    fn parseExpressionStatement(self: *Parser) !ast.ExpressionStatement {
+       const token = self.cur_token; 
+       const expression = self.parseExpression();
+
+       if(self.peekTokenIs(.semicolon)) self.nextToken();
+
+       return ExpressionStatement{
+           .token = token,
+           .expression = expression,
+       };
+    }
+
     fn curTokenIs(self: *Parser, token_type: tokenType) bool {
         return self.cur_token.kind == token_type;
     }
@@ -116,6 +138,8 @@ const Parser = struct {
 
         try self.errors.append(self.alloctor, message);
     }
+
+
 };
 
 // Tests
@@ -153,5 +177,6 @@ const Allocator = std.mem.Allocator;
 const Lexer = @import("lexer.zig").Lexer;
 const ast = @import("ast.zig");
 const Expression = ast.Expression;
+const ExpressionStatement = ast.ExpressionStatement;
 const Token = @import("token.zig").Token;
 const tokenType = Token.TokenType;
